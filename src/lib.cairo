@@ -1,4 +1,7 @@
-pub mod contracts {
-    pub mod meditoken;
-    pub mod MedInvoice;
+ mod contracts {
+     mod meditoken;
+     mod MedInvoice;
+}
+pub mod interfaces {
+     pub mod IMedInvoice;
 }

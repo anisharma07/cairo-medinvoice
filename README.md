@@ -101,8 +101,4 @@ MediToken (`MED`) is a utility token designed for healthcare dApps on Starknet. 
 
 ## 🧪 Testing
 
-Coming soon: Add unit tests using [Cairo Language Testing Framework](https://book.cairo-lang.org/ch99-01-cairo-test.html).
-
----
-
-Happy hacking on Starknet! 🌐✨
+For detailed testing instructions and examples, see [TESTING_SETUP_COMPLETE.md](./TESTING_SETUP_COMPLETE.md).

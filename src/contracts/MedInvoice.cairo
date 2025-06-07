@@ -164,6 +164,4 @@ mod MedInvoiceContract {
                 self.reentrancy.end();
             }
     }
-
-    
 }

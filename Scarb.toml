@@ -1,5 +1,5 @@
 [package]
-name = "sn_medi_token"
+name = "sn_medi_invoice"
 version = "0.1.0"
 edition = "2024_07"
 
@@ -12,7 +12,7 @@ starknet = "2.11.4"
 openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.20.0" }
 
 [dev-dependencies]
-snforge_std = "0.41.0"
+snforge_std = "0.44.0"
 assert_macros = "2.11.4"
 
 [[target.starknet-contract]]

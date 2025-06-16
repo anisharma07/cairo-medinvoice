@@ -2,9 +2,13 @@
 
 MediToken is an ERC-20 compatible token built on Starknet using the OpenZeppelin Cairo contracts. It is intended for use in decentralized healthcare systems as a utility token for transactions, access control, and governance.
 
-## Medi Token: [0x06c23fc4f2017805ad3a9230eb67381b8a8658b7f2995dac5b6fd44a41f513e6](https://sepolia.voyager.online/contract/0x06c23fc4f2017805ad3a9230eb67381b8a8658b7f2995dac5b6fd44a41f513e6)
+# rpc to use: https://starknet-sepolia.public.blastapi.io/rpc/v0_8
 
 ## Med Invoice: [0x06bce0a379ece930bcd48d8f8b619174882a7cb411e9d177e4ede61e81472057](https://sepolia.voyager.online/contract/0x06bce0a379ece930bcd48d8f8b619174882a7cb411e9d177e4ede61e81472057)
+
+v2: [0x044d8b61a156b05bdc96fa6f62fb7fd45aea00ef3d83a467bd5edf5ed5a2be6b](https://sepolia.voyager.online/contract/0x044d8b61a156b05bdc96fa6f62fb7fd45aea00ef3d83a467bd5edf5ed5a2be6b)
+
+v3: [0x017aad7feed14f14cebb3809a7ceaa0479a57c861fb71c836adc7ce46ec90b27](https://sepolia.voyager.online/contract/0x017aad7feed14f14cebb3809a7ceaa0479a57c861fb71c836adc7ce46ec90b27)
 
 ## 🚀 Features
 
@@ -55,8 +59,8 @@ This compiles your contract and outputs the Sierra and CASM artifacts into `./ta
 ### Step 1: Declare the contract
 
 ```bash
-starkli declare target/dev/sn_medi_token_MedToken.contract_class.json # med token
-starkli declare target/dev/sn_medi_token_MedInvoiceContract.contract_class.json #med invoice
+starkli declare target/dev/sn_medi_invoice_MedToken.contract_class.json # med token
+starkli declare target/dev/sn_medi_invoice_MedInvoiceContract.contract_class.json #med invoice
 ```
 
 Save the returned class hash.

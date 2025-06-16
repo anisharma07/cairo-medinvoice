@@ -4,7 +4,9 @@ MediToken is an ERC-20 compatible token built on Starknet using the OpenZeppelin
 
 # rpc to use: https://starknet-sepolia.public.blastapi.io/rpc/v0_8
 
-## Med Invoice: [0x06bce0a379ece930bcd48d8f8b619174882a7cb411e9d177e4ede61e81472057](https://sepolia.voyager.online/contract/0x06bce0a379ece930bcd48d8f8b619174882a7cb411e9d177e4ede61e81472057)
+## Med Invoice: [0x044d8b61a156b05bdc96fa6f62fb7fd45aea00ef3d83a467bd5edf5ed5a2be6b](https://sepolia.voyager.online/contract/0x044d8b61a156b05bdc96fa6f62fb7fd45aea00ef3d83a467bd5edf5ed5a2be6b)
+
+older medinvoice: 0x06bce0a379ece930bcd48d8f8b619174882a7cb411e9d177e4ede61e81472057
 
 v2: [0x044d8b61a156b05bdc96fa6f62fb7fd45aea00ef3d83a467bd5edf5ed5a2be6b](https://sepolia.voyager.online/contract/0x044d8b61a156b05bdc96fa6f62fb7fd45aea00ef3d83a467bd5edf5ed5a2be6b)
 

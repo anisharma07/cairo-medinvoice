@@ -2,8 +2,6 @@
 
 **Medinvoice** is a decentralized healthcare invoice management system built on Starknet, leveraging the power of Cairo smart contracts. This project combines ERC-20 token functionality with invoice management capabilities, enabling secure, transparent, and efficient healthcare payment processing on the blockchain.
 
-The system features **MediToken (MED)**, a utility token specifically designed for healthcare transactions, and a comprehensive invoice management contract that allows healthcare providers to create, manage, and process invoices in a decentralized manner. By utilizing Starknet's scalability and low transaction costs, Medinvoice aims to revolutionize how healthcare payments are handled, providing a trustless environment for both providers and patients.
-
 Key benefits include immutable invoice records, automated payment processing, reduced intermediary costs, and enhanced transparency in healthcare billing. The project is fully compatible with Starknet's ecosystem and follows best practices for security and gas optimization.
 
 ### Deployed Addresses:

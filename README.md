@@ -26,7 +26,6 @@ rpc: https://starknet-sepolia.public.blastapi.io/rpc/v0_8
 MedToken/
 ├── src/contracts
 │   └── MedInvoice.cairo  # Main contract file
-│   └── med_token.cairo  # Main contract file
 ├── Scarb.toml           # Scarb project configuration
 └── README.md            # This file
 ```
@@ -59,7 +58,6 @@ This compiles your contract and outputs the Sierra and CASM artifacts into `./ta
 ### Step 1: Declare the contract
 
 ```bash
-starkli declare target/dev/sn_medi_invoice_MedToken.contract_class.json # med token
 starkli declare target/dev/sn_medi_invoice_MedInvoiceContract.contract_class.json #med invoice
 ```
 
@@ -68,18 +66,11 @@ Save the returned class hash.
 ### Step 2: Deploy the contract
 
 ```bash
-starkli deploy <class_hash> <initial_tokens> <recipient_address> # med token
 starkli deploy <class_hash> <medi_token_address> <recipient_address> # med invoice
 ```
 
 - `initial_tokens`: Number of tokens to mint (without decimals, the multiplier is automatically applied)
 - `recipient_address`: Starknet address of the initial token holder
-
-Example:
-
-```bash
-starkli deploy 0x0123abc... 1000000 0xabc456...
-```
 
 ---
 
@@ -91,6 +82,8 @@ MediToken (`MED`) is a utility token designed for healthcare dApps on Starknet. 
 - Token-gated access to data or functionality
 - Incentivizing participation in healthcare DAOs
 - Governance and voting in decentralized systems
+
+- github repo - https://github.com/anisharma07/cairo-meditoken 
 
 ---
 

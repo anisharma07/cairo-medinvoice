@@ -1,6 +1,10 @@
 # Medinvoice on Starknet
 
-<add description here>
+**Medinvoice** is a decentralized healthcare invoice management system built on Starknet, leveraging the power of Cairo smart contracts. This project combines ERC-20 token functionality with invoice management capabilities, enabling secure, transparent, and efficient healthcare payment processing on the blockchain.
+
+The system features **MediToken (MED)**, a utility token specifically designed for healthcare transactions, and a comprehensive invoice management contract that allows healthcare providers to create, manage, and process invoices in a decentralized manner. By utilizing Starknet's scalability and low transaction costs, Medinvoice aims to revolutionize how healthcare payments are handled, providing a trustless environment for both providers and patients.
+
+Key benefits include immutable invoice records, automated payment processing, reduced intermediary costs, and enhanced transparency in healthcare billing. The project is fully compatible with Starknet's ecosystem and follows best practices for security and gas optimization.
 
 ### Deployed Addresses:
 
@@ -9,8 +13,6 @@ v1: [0x06bce0a379ece930bcd48d8f8b619174882a7cb411e9d177e4ede61e81472057](https:/
 v2: [0x044d8b61a156b05bdc96fa6f62fb7fd45aea00ef3d83a467bd5edf5ed5a2be6b](https://sepolia.voyager.online/contract/0x044d8b61a156b05bdc96fa6f62fb7fd45aea00ef3d83a467bd5edf5ed5a2be6b)
 
 v3 (latest): [0x017aad7feed14f14cebb3809a7ceaa0479a57c861fb71c836adc7ce46ec90b27](https://sepolia.voyager.online/contract/0x017aad7feed14f14cebb3809a7ceaa0479a57c861fb71c836adc7ce46ec90b27)
-
-rpc: https://starknet-sepolia.public.blastapi.io/rpc/v0_8
 
 ## 🚀 Features
 
@@ -57,6 +59,8 @@ This compiles your contract and outputs the Sierra and CASM artifacts into `./ta
 
 ## 🚀 Deploy Using Starkli
 
+rpc: https://starknet-sepolia.public.blastapi.io/rpc/v0_8
+
 ### Step 1: Declare the contract
 
 ```bash
@@ -85,7 +89,7 @@ MediToken (`MED`) is a utility token designed for healthcare dApps on Starknet. 
 - Incentivizing participation in healthcare DAOs
 - Governance and voting in decentralized systems
 
-- github repo - https://github.com/anisharma07/cairo-meditoken 
+- github repo - https://github.com/anisharma07/cairo-meditoken
 
 ---
 

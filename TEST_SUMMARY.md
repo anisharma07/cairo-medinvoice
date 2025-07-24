@@ -1,8 +1,8 @@
-# MedInvoice Contract Testing Summary
+# ParkProInvoice Contract Testing Summary
 
 ## Current Testing Status ✅
 
-The MedInvoice contract has been successfully tested with the following results:
+The ParkProInvoice contract has been successfully tested with the following results:
 
 ### Test Results
 

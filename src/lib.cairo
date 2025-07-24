@@ -1,6 +1,6 @@
  pub mod contracts {
-     pub mod MedInvoice;
+     pub mod ParkProInvoice;
 }
 pub mod interfaces {
-     pub mod IMedInvoice;
+     pub mod IParkProInvoice;
 }

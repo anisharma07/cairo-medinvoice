@@ -1,6 +1,6 @@
 #[starknet::contract]
-mod MedInvoiceContract {
-    use crate::interfaces::IMedInvoice::{IMedInvoiceContract, FileRecord};
+mod ParkProInvoiceContract {
+    use crate::interfaces::IParkProInvoice::{IParkProInvoiceContract, FileRecord, SubscriptionPlan};
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp, get_contract_address};
     use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess, Map};
@@ -12,6 +12,11 @@ mod MedInvoiceContract {
 
     const SUBSCRIPTION_AMOUNT: u256 = 10000000000000000000; // 10 tokens with 18 decimals (10 * 10^18)
     const SUBSCRIPTION_PERIOD: u64 = 365 * 24 * 60 * 60; // 365 days in seconds
+    
+    // Subscription plan constants
+    const PLAN_1_COST: u256 = 1000000000000000000; // 1 token with 18 decimals
+    const PLAN_2_COST: u256 = 10000000000000000000; // 10 tokens with 18 decimals  
+    const PLAN_3_COST: u256 = 50000000000000000000; // 50 tokens with 18 decimals
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: ReentrancyGuardComponent, storage: reentrancy, event: ReentrancyGuardEvent);
@@ -27,8 +32,13 @@ mod MedInvoiceContract {
     struct Storage {
         file_records: Map<(ContractAddress, u64), FileRecord>, // (user, file_id) -> FileRecord
         file_counter: Map<ContractAddress, u64>, 
-        medi_token_address: ContractAddress,
+        ppt_token_address: ContractAddress,
         subscription_end_times: Map<ContractAddress, u64>,
+        // New storage for subscription plans
+        subscription_plans: Map<u8, SubscriptionPlan>, // plan_id -> SubscriptionPlan
+        user_files_allowed: Map<ContractAddress, u64>, // user -> files_allowed
+        user_current_plan: Map<ContractAddress, u8>, // user -> plan_id
+        user_plan_purchases: Map<(ContractAddress, u8), u64>, // (user, plan_id) -> purchase_count
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
@@ -40,6 +50,7 @@ mod MedInvoiceContract {
     enum Event {
         FileSaved: FileSaved,
         NewSubscription: NewSubscription,
+        PlanSubscription: PlanSubscription,
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         #[flat] ReentrancyGuardEvent: ReentrancyGuardComponent::Event,
@@ -62,25 +73,65 @@ mod MedInvoiceContract {
         end_time: u64,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct PlanSubscription {
+        #[key]
+        subscriber: ContractAddress,
+        plan_id: u8,
+        files_allowed: u64,
+        cost: u256,
+    }
+
     #[constructor]
-    fn constructor(ref self: ContractState, medi_token: ContractAddress, initial_owner: ContractAddress) {
+    fn constructor(ref self: ContractState, ppt_token: ContractAddress, initial_owner: ContractAddress) {
         self.ownable.initializer(initial_owner);
-        self.medi_token_address.write(medi_token);
+        self.ppt_token_address.write(ppt_token);
+        
+        // Initialize subscription plans
+        let plan1 = SubscriptionPlan {
+            plan_id: 1,
+            cost: PLAN_1_COST,
+            files_allowed: 5,
+            plan_name: "Basic Plan"
+        };
+        
+        let plan2 = SubscriptionPlan {
+            plan_id: 2,
+            cost: PLAN_2_COST,
+            files_allowed: 50,
+            plan_name: "Standard Plan"
+        };
+        
+        let plan3 = SubscriptionPlan {
+            plan_id: 3,
+            cost: PLAN_3_COST,
+            files_allowed: 250,
+            plan_name: "Premium Plan"
+        };
+        
+        self.subscription_plans.write(1, plan1);
+        self.subscription_plans.write(2, plan2);
+        self.subscription_plans.write(3, plan3);
     }
 
     #[abi(embed_v0)]
-    impl MedInvoiceContractImpl of IMedInvoiceContract<ContractState> {
+    impl ParkProInvoiceContractImpl of IParkProInvoiceContract<ContractState> {
        
 
        fn save_file(ref self: ContractState, file_name: ByteArray, ipfs_cid: ByteArray) {
             assert(file_name.len() > 0, 'File name cannot be empty');
             assert(ipfs_cid.len() > 0, 'IPFS CID cannot be empty');
             let caller = get_caller_address();
-            let token_dispatcher = IERC20Dispatcher { contract_address: self.medi_token_address.read() };
+            let token_dispatcher = IERC20Dispatcher { contract_address: self.ppt_token_address.read() };
             let balance = token_dispatcher.balance_of(caller);
-            assert(balance >= u256 { low: 1, high: 0 }, 'Not enough Med Tokens');
+            assert(balance >= u256 { low: 1, high: 0 }, 'Not enough PPT Tokens');
 
-            let file_id = self.file_counter.read(caller) + 1;
+            // Check file limits
+            let current_file_count = self.file_counter.read(caller);
+            let files_allowed = self.user_files_allowed.read(caller);
+            assert(files_allowed > current_file_count, 'Purchase more file storage');
+
+            let file_id = current_file_count + 1;
             let timestamp = get_block_timestamp();
             
             let file_record = FileRecord {
@@ -123,7 +174,7 @@ mod MedInvoiceContract {
         }
 
         fn get_user_tokens(self: @ContractState, user_address: ContractAddress) -> u256 {
-            let token_dispatcher = IERC20Dispatcher { contract_address: self.medi_token_address.read() };
+            let token_dispatcher = IERC20Dispatcher { contract_address: self.ppt_token_address.read() };
             token_dispatcher.balance_of(user_address)
         }
 
@@ -146,13 +197,13 @@ mod MedInvoiceContract {
             let caller = get_caller_address();
             assert(!self.is_subscribed(caller), 'ALREADY_SUBSCRIBED');
 
-            let token_dispatcher = IERC20Dispatcher { contract_address: self.medi_token_address.read() };
+            let token_dispatcher = IERC20Dispatcher { contract_address: self.ppt_token_address.read() };
             let balance = token_dispatcher.balance_of(caller);
-            assert(balance >= SUBSCRIPTION_AMOUNT, 'Insufficient Med tokens');
-            // User must have approved this contract to spend SUBSCRIPTION_AMOUNT of their Medi tokens
+            assert(balance >= SUBSCRIPTION_AMOUNT, 'Insufficient PPT tokens');
+            // User must have approved this contract to spend SUBSCRIPTION_AMOUNT of their PPT tokens
             let contract_addr = get_contract_address();
             let success = token_dispatcher.transfer_from(caller, contract_addr, SUBSCRIPTION_AMOUNT);
-            assert(success, 'MEDI_TOKEN_TRANSFER_FAILED');
+            assert(success, 'PPT_TOKEN_TRANSFER_FAILED');
 
             let end_time = get_block_timestamp() + SUBSCRIPTION_PERIOD;
             self.subscription_end_times.write(caller, end_time);
@@ -165,7 +216,7 @@ mod MedInvoiceContract {
                 self.reentrancy.start();
                 self.ownable.assert_only_owner();
                 let owner_address = self.ownable.owner();
-                let token_dispatcher = IERC20Dispatcher { contract_address: self.medi_token_address.read() };
+                let token_dispatcher = IERC20Dispatcher { contract_address: self.ppt_token_address.read() };
                 
                 // Check the contract's token balance
                 let contract_balance = token_dispatcher.balance_of(get_contract_address());
@@ -173,9 +224,74 @@ mod MedInvoiceContract {
                 
                 // Transfer tokens from this contract to the owner
                 let success = token_dispatcher.transfer(owner_address, amount);
-                assert(success, 'MEDI_TOKEN_TRANSFER_FAILED');
+                assert(success, 'PPT_TOKEN_TRANSFER_FAILED');
                 self.reentrancy.end();
             }
+
+        fn subscribe_to_plan(ref self: ContractState, plan_id: u8) {
+            self.reentrancy.start();
+            let caller = get_caller_address();
+            
+            // Get plan details
+            let plan = self.subscription_plans.read(plan_id);
+            assert(plan.plan_id != 0, 'Invalid plan ID');
+            
+            let token_dispatcher = IERC20Dispatcher { contract_address: self.ppt_token_address.read() };
+            let balance = token_dispatcher.balance_of(caller);
+            assert(balance >= plan.cost, 'Insufficient PPT tokens');
+            
+            // User must have approved this contract to spend the plan cost
+            let contract_addr = get_contract_address();
+            let success = token_dispatcher.transfer_from(caller, contract_addr, plan.cost);
+            assert(success, 'PPT_TOKEN_TRANSFER_FAILED');
+            
+            // Add files to user's current allowance (cumulative)
+            let current_files_allowed = self.user_files_allowed.read(caller);
+            let new_files_allowed = current_files_allowed + plan.files_allowed;
+            self.user_files_allowed.write(caller, new_files_allowed);
+            self.user_current_plan.write(caller, plan_id);
+            
+            // Track plan purchases
+            let current_purchases = self.user_plan_purchases.read((caller, plan_id));
+            self.user_plan_purchases.write((caller, plan_id), current_purchases + 1);
+            
+            self.emit(PlanSubscription { 
+                subscriber: caller, 
+                plan_id: plan_id,
+                files_allowed: new_files_allowed,
+                cost: plan.cost
+            });
+            self.reentrancy.end();
+        }
+
+        fn get_subscription_plan(self: @ContractState, plan_id: u8) -> SubscriptionPlan {
+            self.subscription_plans.read(plan_id)
+        }
+
+        fn get_user_file_limits(self: @ContractState, user: ContractAddress) -> (u64, u64) {
+            let files_used = self.file_counter.read(user);
+            let files_allowed = self.user_files_allowed.read(user);
+            (files_used, files_allowed)
+        }
+
+        fn get_all_plans(self: @ContractState) -> Array<SubscriptionPlan> {
+            let mut plans = ArrayTrait::new();
+            plans.append(self.subscription_plans.read(1));
+            plans.append(self.subscription_plans.read(2));
+            plans.append(self.subscription_plans.read(3));
+            plans
+        }
+
+        fn get_user_plan_purchases(self: @ContractState, user: ContractAddress, plan_id: u8) -> u64 {
+            self.user_plan_purchases.read((user, plan_id))
+        }
+
+        fn get_user_subscription_summary(self: @ContractState, user: ContractAddress) -> (u64, u64, u8) {
+            let files_used = self.file_counter.read(user);
+            let files_allowed = self.user_files_allowed.read(user);
+            let current_plan = self.user_current_plan.read(user);
+            (files_used, files_allowed, current_plan)
+        }
     }
 }
 
